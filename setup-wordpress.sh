@@ -4,43 +4,56 @@
 sudo apt update -y
 sudo apt upgrade -y
 
-# Nginx ve PHP kurulumu
-sudo apt install -y nginx php7.4 php7.4-fpm php7.4-mysql
+# WordPress için mevcut klasör ve izinleri kontrol et
+WORDPRESS_DIR="/var/www/html/adoptionv2user"
+if [ ! -d "$WORDPRESS_DIR" ]; then
+  echo "WordPress dizini bulunamadı: $WORDPRESS_DIR"
+  exit 1
+fi
 
-# WordPress için gerekli klasörlerin oluşturulması
-sudo mkdir -p /var/www/html
-sudo chmod -R 755 /var/www/html
+# Nginx ve PHP kurulumu (sadece gerekli modülleri yükle)
+sudo apt install -y php7.4-fpm php7.4-mysql
 
-# MySQL Veritabanı Oluşturma
+# MySQL Veritabanı ve Kullanıcı Ayarları
 DB_NAME="adoptionv2"
 DB_USER="adoptionv2user"
 DB_PASS="StrongPassword123"
-sudo mysql -e "CREATE DATABASE ${DB_NAME} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-sudo mysql -e "CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';"
+
+# Veritabanı ve kullanıcı oluşturuluyor
+sudo mysql -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+sudo mysql -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';"
 sudo mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';"
 sudo mysql -e "FLUSH PRIVILEGES;"
 
-# WordPress İndirme ve Yükleme
-sudo wget -O /tmp/latest.tar.gz https://wordpress.org/latest.tar.gz
-sudo tar -xzf /tmp/latest.tar.gz -C /var/www/html --strip-components=1
-sudo chown -R www-data:www-data /var/www/html
-
 # WordPress wp-config.php ayarları
-sudo mv /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
-sudo sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wp-config.php
-sudo sed -i "s/username_here/${DB_USER}/" /var/www/html/wp-config.php
-sudo sed -i "s/password_here/${DB_PASS}/" /var/www/html/wp-config.php
+WP_CONFIG="$WORDPRESS_DIR/wp-config.php"
+if [ ! -f "$WP_CONFIG" ]; then
+  echo "wp-config.php bulunamadı: $WP_CONFIG"
+  exit 1
+fi
 
-# Nginx yapılandırması
+# Veritabanı bilgilerini wp-config.php dosyasına yaz
+sudo sed -i "s/database_name_here/${DB_NAME}/" $WP_CONFIG
+sudo sed -i "s/username_here/${DB_USER}/" $WP_CONFIG
+sudo sed -i "s/password_here/${DB_PASS}/" $WP_CONFIG
+
+# Nginx yapılandırmasını güncelleme
+NGINX_CONF="/etc/nginx/sites-available/default"
+if [ ! -f "$NGINX_CONF" ]; then
+  echo "Nginx yapılandırma dosyası bulunamadı: $NGINX_CONF"
+  exit 1
+fi
+
+# Nginx yapılandırmasını düzenle
 sudo bash -c 'cat > /etc/nginx/sites-available/default' << EOL
 server {
     listen 80;
-    root /var/www/html;
+    root $WORDPRESS_DIR;
     index index.php index.html index.htm;
     server_name _;
 
     location / {
-        try_files \$uri \$uri/ /index.php?$args;
+        try_files \$uri \$uri/ /index.php?\$args;
     }
 
     location ~ \.php$ {
