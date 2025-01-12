@@ -41,11 +41,10 @@ fi
 # Nginx yeniden başlatma
 systemctl restart nginx || { echo "Nginx yeniden başlatılamadı."; exit 1; }
 
-# MySQL yeni kullanıcı oluşturma, yetkilendirme ve eski kullanıcıyı silme
+# MySQL yeni kullanıcı oluşturma
 mysql -u root <<EOF
 CREATE USER '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';
 GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'localhost' WITH GRANT OPTION;
-DROP USER 'adoptionv2user'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
@@ -56,6 +55,5 @@ fi
 
 # MySQL yeniden başlatma
 systemctl restart mysql || { echo "MySQL yeniden başlatılamadı."; exit 1; }
-
 
 echo "Tüm işlemler başarıyla tamamlandı."
