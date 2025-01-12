@@ -4,8 +4,6 @@
 MYSQL_USER=$1
 MYSQL_PASSWORD=$2
 DOMAIN_NAME=$3
-MYSQL_OLD_USER=$4
-MYSQL_OLD_PASSWORD=$5
 
 # Parametre kontrolü
 if [ -z "$MYSQL_USER" ] || [ -z "$MYSQL_PASSWORD" ] || [ -z "$DOMAIN_NAME" ] || [ -z "$MYSQL_OLD_USER" ] || [ -z "$MYSQL_OLD_PASSWORD" ]; then
@@ -44,7 +42,7 @@ fi
 systemctl restart nginx || { echo "Nginx yeniden başlatılamadı."; exit 1; }
 
 # MySQL yeni kullanıcı oluşturma, yetkilendirme ve eski kullanıcıyı silme
-mysql -u root<<EOF
+mysql -u root <<EOF
 CREATE USER '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';
 GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'localhost' WITH GRANT OPTION;
 DROP USER 'adoptionv2user'@'localhost';
