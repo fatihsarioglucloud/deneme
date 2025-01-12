@@ -4,12 +4,30 @@
 MYSQL_USER=$1
 MYSQL_PASSWORD=$2
 DOMAIN_NAME=$3
+MYSQL_OLD_USER=$4
+MYSQL_OLD_PASSWORD=$5
 
 # Parametre kontrolü
-if [ -z "$MYSQL_USER" ] || [ -z "$MYSQL_PASSWORD" ] || [ -z "$DOMAIN_NAME" ]; then
-  echo "Kullanım: $0 <MySQL Kullanıcı Adı> <MySQL Parolası> <Domain Adı>"
+if [ -z "$MYSQL_USER" ] || [ -z "$MYSQL_PASSWORD" ] || [ -z "$DOMAIN_NAME" ] || [ -z "$MYSQL_OLD_USER" ] || [ -z "$MYSQL_OLD_PASSWORD" ]; then
+  echo "Kullanım: $0 <Yeni MySQL Kullanıcı Adı> <Yeni MySQL Parolası> <Domain Adı> <Eski MySQL Kullanıcı Adı> <Eski MySQL Parolası>"
   exit 1
 fi
+
+# MySQL yeni kullanıcı oluşturma, yetkilendirme ve eski kullanıcıyı silme
+mysql -u"$MYSQL_OLD_USER" -p"$MYSQL_OLD_PASSWORD" <<EOF
+CREATE USER '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';
+GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'localhost' WITH GRANT OPTION;
+DROP USER '$MYSQL_OLD_USER'@'localhost';
+FLUSH PRIVILEGES;
+EOF
+
+if [ $? -ne 0 ]; then
+  echo "MySQL işlemleri sırasında bir hata oluştu."
+  exit 1
+fi
+
+# MySQL yeniden başlatma
+systemctl restart mysql || { echo "MySQL yeniden başlatılamadı."; exit 1; }
 
 # WordPress wp-config.php dosya yolu
 WP_CONFIG_PATH="/var/www/html/adoptionv2user/wp-config.php"
