@@ -7,7 +7,7 @@ DOMAIN_NAME=$3
 
 # Parametre kontrolü
 if [ -z "$MYSQL_USER" ] || [ -z "$MYSQL_PASSWORD" ] || [ -z "$DOMAIN_NAME" ]; then
-  echo "Kullanım: $0 <Yeni MySQL Kullanıcı Adı> <Yeni MySQL Parolası> <Domain Adı>"
+  echo "Kullanım: $0 <MySQL Kullanıcı Adı> <MySQL Parolası> <Domain Adı>"
   exit 1
 fi
 
@@ -42,6 +42,7 @@ fi
 systemctl restart nginx || { echo "Nginx yeniden başlatılamadı."; exit 1; }
 
 # MySQL yeni kullanıcı oluşturma
+echo "MySQL kullanıcı oluşturuluyor..."
 mysql -u root <<EOF
 CREATE USER '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';
 GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'localhost' WITH GRANT OPTION;
@@ -54,6 +55,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # MySQL yeniden başlatma
+echo "MySQL yeniden başlatılıyor..."
 systemctl restart mysql || { echo "MySQL yeniden başlatılamadı."; exit 1; }
 
 echo "Tüm işlemler başarıyla tamamlandı."
