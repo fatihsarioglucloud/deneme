@@ -6,7 +6,7 @@ MYSQL_PASSWORD=$2
 DOMAIN_NAME=$3
 
 # Parametre kontrolü
-if [ -z "$MYSQL_USER" ] || [ -z "$MYSQL_PASSWORD" ] || [ -z "$DOMAIN_NAME" ] || [ -z "$MYSQL_OLD_USER" ] || [ -z "$MYSQL_OLD_PASSWORD" ]; then
+if [ -z "$MYSQL_USER" ] || [ -z "$MYSQL_PASSWORD" ] || [ -z "$DOMAIN_NAME" ]; then
   echo "Kullanım: $0 <Yeni MySQL Kullanıcı Adı> <Yeni MySQL Parolası> <Domain Adı>"
   exit 1
 fi
