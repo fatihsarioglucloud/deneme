@@ -25,8 +25,8 @@ sed -i "s/define( 'DB_USER', '.*' );/define( 'DB_USER', '$MYSQL_USER' );/" "$WP_
 sed -i "s/define( 'DB_PASSWORD', '.*' );/define( 'DB_PASSWORD', '$MYSQL_PASSWORD' );/" "$WP_CONFIG_PATH"
 
 # WordPress URL bilgilerini güncelle
-sed -i "s|define( 'WP_HOME', '.*' );|define( 'WP_HOME', 'http://$DOMAIN_NAME' );|" "$WP_CONFIG_PATH"
-sed -i "s|define( 'WP_SITEURL', '.*' );|define( 'WP_SITEURL', 'http://$DOMAIN_NAME' );|" "$WP_CONFIG_PATH"
+sed -i "s|define( 'WP_HOME', '.*' );|define( 'WP_HOME', 'https://$DOMAIN_NAME' );|" "$WP_CONFIG_PATH"
+sed -i "s|define( 'WP_SITEURL', '.*' );|define( 'WP_SITEURL', 'https://$DOMAIN_NAME' );|" "$WP_CONFIG_PATH"
 
 # Nginx yapılandırması
 NGINX_CONF="/etc/nginx/sites-available/default"
