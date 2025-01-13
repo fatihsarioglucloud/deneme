@@ -43,9 +43,9 @@ systemctl restart nginx || { echo "Nginx yeniden başlatılamadı."; exit 1; }
 
 # MySQL yeni kullanıcı oluşturma
 echo "MySQL kullanıcı oluşturuluyor..."
-mysql -u root -e "CREATE USER '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';"
-mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'localhost' WITH GRANT OPTION;"
-mysql -u root -e "FLUSH PRIVILEGES;"
+sudo mysql -u root -e "CREATE USER '${MYSQL_USER}'@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';"
+sudo mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER}'@'localhost' WITH GRANT OPTION;"
+sudo mysql -u root -e "FLUSH PRIVILEGES;"
 
 
 if [ $? -ne 0 ]; then
