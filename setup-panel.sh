@@ -9,12 +9,6 @@ if [ -z "$DOMAIN_NAME" ]; then
   exit 1
 fi
 
-# wp-config.php dosyasını kontrol et
-if [ ! -f "$WP_CONFIG_PATH" ]; then
-  echo "wp-config.php dosyası bulunamadı: $WP_CONFIG_PATH"
-  exit 1
-fi
-
 # Nginx yapılandırması
 NGINX_CONF="/home/azureuser/devops/nginx/default.conf"
 if [ -f "$NGINX_CONF" ]; then
@@ -26,6 +20,6 @@ else
 fi
 
 # Nginx yeniden başlatma
-systemctl restart nginx || { echo "Nginx yeniden başlatılamadı."; exit 1; }
+sudo docker restart nginx || { echo "Nginx yeniden başlatılamadı."; exit 1; }
 
 echo "Tüm işlemler başarıyla tamamlandı."
