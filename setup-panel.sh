@@ -19,7 +19,8 @@ else
   exit 1
 fi
 
-# Nginx yeniden başlatma
+# Nginx ve Mongodb yeniden başlatma
 sudo docker restart nginx || { echo "Nginx yeniden başlatılamadı."; exit 1; }
+sudo docker restart mongodb || { echo "Mongodb yeniden başlatılamadı."; exit 1; }
 
 echo "Tüm işlemler başarıyla tamamlandı."
